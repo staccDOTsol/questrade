@@ -1,0 +1,104 @@
+<head>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+</head>
+
+<body>
+<div id="container" style="height: 500px; min-width: 310px"></div>
+
+
+<script>
+var usds = []
+    <%for (var result in usd){%>
+  usds.push(([<%=usd[result]%>]) )
+  <%}%>
+
+
+    var options = {
+
+
+
+        rangeSelector: {
+            buttons: [{
+                count: 1,
+                type: 'minute',
+                text: '1m'
+            }, {
+                count: 5,
+                type: 'minute',
+                text: '5m'
+            }, {
+                count: 7,
+                type: 'minute',
+                text: '7m'
+            }, {
+                count: 14,
+                type: 'minute',
+                text: '14m'
+            }, {
+                count: 1,
+                type: 'hour',
+                text: '1h'
+            }, {
+                type: 'all',
+                text: 'All'
+            }],
+            inputEnabled: false,
+            selected: 0
+        },
+
+
+        title: {
+            text: 'BTC Balance'
+        },
+
+
+        yAxis: [],
+
+        tooltip: {
+            split: true
+        },
+        series: [
+        ]
+    }
+
+            var chart = Highcharts.stockChart('container', options);
+        setInterval(function() {
+           //chart = Highcharts.stockChart('container', options);
+           $.getJSON('http://localhost:7138/update?name=test', function(jsondata) {
+                usds.push( jsondata.btc); 
+chart.series[0].setData(usds);
+
+
+})
+}, 2000);
+
+
+    $(document).ready(function() {
+    chart.addAxis({ // Secondary yAxis
+        id: 'usd-axis',
+        title: {
+            text: '% Delta'
+        },
+        lineWidth: 2,
+        lineColor: '#00FF00',
+        opposite: true
+    });
+    chart.addSeries({
+        name: 'USD Combined Delta',
+        type: 'line',
+        color: '#00FF00',
+        yAxis: 'usd-axis',
+        data: usds
+    });
+           
+
+
+})
+</script>
+
+</body>
